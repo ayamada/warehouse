@@ -1,0 +1,62 @@
+--- skk.vim.orig	2016-12-11 08:51:11.000000000 +0900
++++ skk.vim	2016-12-14 16:48:27.000000000 +0900
+@@ -4,7 +4,7 @@
+ "
+ " Author: Noriaki Yagi <no_yag@yahoo.co.jp>
+ " Version: $Id: skk.vim,v 0.22 2006/10/11 09:26:53 noriaki Exp noriaki $
+-" Last Change: 2011-03-11.
++" Last Change: 14-Dec-2016.
+ "
+ " 使い方:
+ " skk_jisyo および skk_large_jisyo を適宜変更する。
+@@ -1456,6 +1456,8 @@
+ let s:bs_save = &backspace
+ let s:thisfile = expand("<sfile>")	" for RULES section
+ 
++let s:skk_jisyo_registered = 0 " 新しい単語を登録したか？
++
+ " }}}
+ 
+ " Helper Functions {{{
+@@ -3094,6 +3096,7 @@
+       return SkkPreviousCand()
+     endif
+     call s:SkkUpdateJisyo(result)
++    let s:skk_jisyo_registered = 1
+     if g:skk_use_numeric_conversion && b:skk_num_list_count > 0
+       let old_count = b:skk_cand_count
+       call s:SkkProcessNumCandidate(result)
+@@ -3613,6 +3616,7 @@
+       endif
+     endif
+     let s:skk_jisyo_modified = 1
++    let s:skk_jisyo_registered = 1
+   finally
+     exe cmd
+   endtry
+@@ -3634,10 +3638,13 @@
+   let fsize = getfsize(jisyo)
+   let ftime = getftime(jisyo)
+   if s:skk_jisyo_fsize != fsize || s:skk_jisyo_ftime != ftime
+-    let msg = "SKK: Someone modified " . g:skk_jisyo
+-    let msg = msg . "\nSKK: Stop saving " . g:skk_jisyo
+-    echo msg
+-    return
++    " 単語登録されている場合は強行上書きを行う
++    if s:skk_jisyo_registered != 0
++      let msg = "SKK: Someone modified " . g:skk_jisyo
++      let msg = msg . "\nSKK: Stop saving " . g:skk_jisyo
++      echo msg
++      return
++    endif
+   endif
+   if v:version < 700
+     let need = s:skk_jisyo_bufnr != -1 && bufexists(s:skk_jisyo_bufnr) && s:skk_jisyo_modified
+@@ -3689,6 +3696,7 @@
+       let s:skk_jisyo_ftime = getftime(jisyo)
+       let s:skk_jisyo_fsize = jisyosize
+       let s:skk_jisyo_modified = 0
++      let s:skk_jisyo_registered = 0
+       if !a:silent
+         echon "\rSaving SKK jisyo...done"
+       endif
