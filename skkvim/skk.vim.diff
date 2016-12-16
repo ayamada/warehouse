@@ -1,11 +1,11 @@
 --- skk.vim.orig	2016-12-11 08:51:11.000000000 +0900
-+++ skk.vim	2016-12-14 16:48:27.000000000 +0900
++++ skk.vim	2016-12-17 01:28:57.000000000 +0900
 @@ -4,7 +4,7 @@
  "
  " Author: Noriaki Yagi <no_yag@yahoo.co.jp>
  " Version: $Id: skk.vim,v 0.22 2006/10/11 09:26:53 noriaki Exp noriaki $
 -" Last Change: 2011-03-11.
-+" Last Change: 14-Dec-2016.
++" Last Change: 17-Dec-2016.
  "
  " 使い方:
  " skk_jisyo および skk_large_jisyo を適宜変更する。
@@ -34,7 +34,7 @@
    finally
      exe cmd
    endtry
-@@ -3634,10 +3638,13 @@
+@@ -3634,10 +3638,14 @@
    let fsize = getfsize(jisyo)
    let ftime = getftime(jisyo)
    if s:skk_jisyo_fsize != fsize || s:skk_jisyo_ftime != ftime
@@ -42,8 +42,9 @@
 -    let msg = msg . "\nSKK: Stop saving " . g:skk_jisyo
 -    echo msg
 -    return
-+    " 単語登録されている場合は強行上書きを行う
-+    if s:skk_jisyo_registered != 0
++    " 単語登録されてない場合のみ書き出しを中断する
++    " (単語登録されている場合は強行上書きを行う)
++    if s:skk_jisyo_registered == 0
 +      let msg = "SKK: Someone modified " . g:skk_jisyo
 +      let msg = msg . "\nSKK: Stop saving " . g:skk_jisyo
 +      echo msg
@@ -52,7 +53,7 @@
    endif
    if v:version < 700
      let need = s:skk_jisyo_bufnr != -1 && bufexists(s:skk_jisyo_bufnr) && s:skk_jisyo_modified
-@@ -3689,6 +3696,7 @@
+@@ -3689,6 +3697,7 @@
        let s:skk_jisyo_ftime = getftime(jisyo)
        let s:skk_jisyo_fsize = jisyosize
        let s:skk_jisyo_modified = 0
