@@ -1,0 +1,16 @@
+#!/bin/sh
+# $Id$
+#GIT_VERSION=2.6.2
+#GIT=/usr/local/Cellar/git/$GIT_VERSION/bin/git
+#GIT=/usr/bin/git
+GIT=/usr/local/bin/git
+if [ $# -lt 1 ]; then
+  $GIT
+elif [ $1 = "commit" ]; then
+  $GIT "$@" && touch `$GIT rev-parse --git-dir`/unpushed
+elif [ $1 = "push" ]; then
+  $GIT "$@" && rm -f `$GIT rev-parse --git-dir`/unpushed
+else
+  $GIT "$@"
+fi
+# vim:set ft=sh sw=2 ts=2 et:

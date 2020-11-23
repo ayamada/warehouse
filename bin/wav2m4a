@@ -1,0 +1,22 @@
+#!/bin/bash
+
+
+
+if [ $# -lt 1 ]; then
+  echo "usage: AR=44100 AB=64k AC=1 $0 path/to/file1.wav *.mp3 *.ogg"
+else
+  AR=${AR:-44100}
+  AB=${AB:-64k}
+  AC=${AC:-1}
+  for SRCFILE in "$@"; do
+    OUTFILE=${SRCFILE%.*}.m4a
+    echo "ffmpeg -i $SRCFILE -vn -acodec aac -ar ${AR} -ab ${AB} -ac ${AC} ${OUTFILE}"
+    ffmpeg -i $SRCFILE -vn -acodec aac -ar ${AR} -ab ${AB} -ac ${AC} ${OUTFILE} && echo "wrote ${OUTFILE}"
+  done
+fi
+
+
+
+# vim:set ft=sh sw=2 ts=2 et:
+
+
